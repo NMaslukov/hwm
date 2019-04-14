@@ -4,9 +4,11 @@ import com.dudoser.enums.Bild;
 import com.dudoser.enums.Level;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Hero {
     private int id;
     private Level level;

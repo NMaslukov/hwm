@@ -3,9 +3,10 @@ package com.dudoser.dto;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class RandomizedGroup {
-    private List<Hero> firstGroup;
-    private List<Hero> secondGroup;
+    private Set<Hero> firstGroup;
+    private Set<Hero> secondGroup;
 }
