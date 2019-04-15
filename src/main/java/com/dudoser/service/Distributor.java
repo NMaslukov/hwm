@@ -7,10 +7,8 @@ import com.google.common.collect.Sets;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,46 +16,63 @@ import java.util.stream.Collectors;
 
 class Distributor {
 
-    private static final int AVERAGE_TEAM_MEMBER = 2;
+    private static final int AVERAGE_TEAM_MEMBER = 3;
     private static final double DELTA = 1;
 
     List<RandomizedGroup> randomize(ImmutableSet<Hero> heroes){
-
-
         double averageGroupWeight = calculateAverageGroupWeight(heroes);
         log("averageGroupWeight: " + averageGroupWeight);
 
+        List<Pair<Double, Set<Hero>>> weightTeamPairList = getWeightTeamPairList(heroes);
+        Set<Hero> distributedHeroes = new HashSet<>();
+        List<RandomizedGroup> result = new ArrayList<>();
+        Set<Hero> notMatched = new HashSet<>();
+
+        for (Pair<Double, Set<Hero>> pair : weightTeamPairList) {
+            if(!alreadyDistributed(distributedHeroes, pair)) {
+                Set<Hero> appropriateOpponent = findAppropriateOpponent(weightTeamPairList, distributedHeroes, pair);
+                processResult(result, notMatched, pair, appropriateOpponent);
+            }
+        }
+
+        return result;
+    }
+
+    private void processResult(List<RandomizedGroup> result, Set<Hero> notMatched, Pair<Double, Set<Hero>> pair, Set<Hero> appropriateOpponent) {
+        if(opponentNotFound(appropriateOpponent)){
+            notMatched.addAll(pair.getValue());
+        } else {
+            result.add(new RandomizedGroup(pair.getValue(), appropriateOpponent));
+        }
+    }
+
+    private boolean opponentNotFound(Set<Hero> set){
+        return set == null;
+    }
+
+    private Set<Hero> findAppropriateOpponent(List<Pair<Double, Set<Hero>>> allHeroes, Set<Hero> distributedHeroes, Pair<Double, Set<Hero>> targetHeroes) {
+        for (Pair<Double, Set<Hero>> group: allHeroes) {
+            if(!group.equals(targetHeroes) && Collections.disjoint(group.getValue(), targetHeroes.getValue()) && !alreadyDistributed(distributedHeroes, group) && Math.abs(group.getKey() - targetHeroes.getKey()) < DELTA){
+                distributedHeroes.addAll(group.getValue()); //добавляем в Distributed тут
+                return group.getValue();
+            }
+        }
+        return null;
+    }
+    //TODO extract distributedHeroes to class level
+    private boolean alreadyDistributed(Set<Hero> distributedHeroes, Pair<Double, Set<Hero>> pair) {
+        return !Collections.disjoint(distributedHeroes, pair.getValue());
+    }
+
+    private List<Pair<Double, Set<Hero>>> getWeightTeamPairList(ImmutableSet<Hero> heroes) {
         Set<Set<Hero>> combinations = Sets.combinations(heroes, AVERAGE_TEAM_MEMBER);
         List<Pair<Double, Set<Hero>>> weightTeamPair = combinations.stream().
                 map(a -> new Pair<>(a.stream().mapToDouble(Hero::getWeight).sum(), a))
+                .sorted((a,b) -> (-1) * Double.compare(a.getKey(), b.getKey()))
                 .collect(Collectors.toList());
-
-        List<Set<Hero>> tempo = getTempo(averageGroupWeight, weightTeamPair);
-
-        List<Set<Hero>> forRemoving = new LinkedList<>();
-        for (Set<Hero> heroSet : tempo) {
-            if(new HashSet<>(forRemoving).contains(heroSet)) continue;
-            List<Set<Hero>> dublicates = tempo.stream().filter(e -> e.stream().anyMatch(h -> heroSet.contains(h))).collect(Collectors.toList());
-            dublicates.remove(heroSet);
-            forRemoving.addAll(dublicates);
-        }
-        forRemoving = forRemoving.stream().distinct().collect(Collectors.toList());
-        tempo.removeAll(forRemoving);
-        List<RandomizedGroup> result = calculateResult(tempo);
-
-        return result;
+        return weightTeamPair;
     }
 
-    private List<RandomizedGroup> calculateResult(List<Set<Hero>> tempo) {
-        List<RandomizedGroup> result = new ArrayList<>();
-        for (int i = 0; i < tempo.size(); i+=2) {
-            RandomizedGroup group = new RandomizedGroup();
-            group.setFirstGroup(tempo.get(i));
-            group.setSecondGroup(tempo.get(i + 1));
-            result.add(group);
-        }
-        return result;
-    }
 
     private List<Set<Hero>> getTempo(double averageGroupWeight, List<Pair<Double, Set<Hero>>> weightTeamPair) {
         List<Set<Hero>> tempo = new ArrayList<>();

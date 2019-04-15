@@ -16,6 +16,7 @@ import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DistributorTest {
 
@@ -29,11 +30,10 @@ public class DistributorTest {
         List<Hero> firstGroup = new ArrayList<>(result.get(0).getFirstGroup());
         List<Hero> secondGroup = new ArrayList<>(result.get(0).getSecondGroup());
 
-        assertEquals(2, firstGroup.size());
-        assertEquals(2, secondGroup.size());
+        assertEquals(3, firstGroup.size());
+        assertEquals(3, secondGroup.size());
 
-        assert firstGroup.get(0).getLevel() != firstGroup.get(1).getLevel();
-        assert secondGroup.get(0).getLevel() != secondGroup.get(1).getLevel();
+        assert (firstGroup.get(0).getLevel() != firstGroup.get(1).getLevel() || firstGroup.get(0).getLevel() != firstGroup.get(2).getLevel());
     }
 
     private ImmutableSet<Hero> getFirstHeroesTestList(){
@@ -43,8 +43,20 @@ public class DistributorTest {
         set.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
         set.add(new Hero(new Random().nextInt()*1000, Level.TEN, Bild.ATTACK));
         set.add(new Hero(new Random().nextInt()*1000, Level.TEN, Bild.ATTACK));
+        set.add(new Hero(new Random().nextInt()*1000, Level.TEN, Bild.ATTACK));
+        set.add(new Hero(new Random().nextInt()*1000, Level.TEN, Bild.ATTACK));
 
         return ImmutableSet.copyOf(set);
     }
 
+    @Test
+    public void disjoinTest(){
+        Set<Hero> a = new HashSet<>();
+        Set<Hero> b = new HashSet<>();
+        Hero h = new Hero(1, Level.NINTH, Bild.ATTACK);
+        a.add(h);
+        b.add(h);
+
+        assertTrue(Collections.disjoint(a,b));
+    }
 }
