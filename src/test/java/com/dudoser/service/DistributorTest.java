@@ -3,7 +3,6 @@ package com.dudoser.service;
 import com.dudoser.dto.Hero;
 import com.dudoser.dto.RandomizedGroup;
 import com.dudoser.dto.RandomizedResult;
-import com.dudoser.dto.Team;
 import com.dudoser.enums.Bild;
 import com.dudoser.enums.Level;
 import com.google.common.collect.ImmutableSet;
@@ -16,14 +15,15 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import static com.dudoser.service.Distributor.INITIAL_TEAM_MEMBER;
 import static org.junit.Assert.*;
 
 public class DistributorTest {
 
     @Test
     public void randomizeFirst() {
-        Distributor distributor = new Distributor();
-        RandomizedResult randomizedResult = distributor.randomize(getFirstHeroesTestList());
+        Distributor distributor = new Distributor(getFirstHeroesTestList());
+        RandomizedResult randomizedResult = distributor.randomize();
         List<RandomizedGroup> result = randomizedResult.getRandomizedGroups();
 
         assertEquals(1, result.size());
@@ -56,8 +56,8 @@ public class DistributorTest {
 
     @Test
     public void randomizeSecond() {
-        Distributor distributor = new Distributor();
-        RandomizedResult randomizedResult = distributor.randomize(getSecondHeroesTestList());
+        Distributor distributor = new Distributor(getSecondHeroesTestList());
+        RandomizedResult randomizedResult = distributor.randomize();
         List<RandomizedGroup> result = randomizedResult.getRandomizedGroups();
 
         assertEquals(2, result.size());
@@ -99,28 +99,29 @@ public class DistributorTest {
 
     @Test
     public void randomizeThird() {
-        Distributor distributor = new Distributor();
-        RandomizedResult randomizedResult = distributor.randomize(getThrirdHeroesTestList());
+        Distributor distributor = new Distributor(getThirdHeroesTestList());
+        RandomizedResult randomizedResult = distributor.randomize();
         List<RandomizedGroup> result = randomizedResult.getRandomizedGroups();
         System.out.println(result);
     }
 
-    private ImmutableSet<Hero> getThrirdHeroesTestList() {
+    private ImmutableSet<Hero> getThirdHeroesTestList() {
         Set<Hero> set = new HashSet<>();
 
-        set.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
-        set.add(new Hero(new Random().nextInt()*1000, Level.ELEVEN, Bild.ATTACK));
+        set.add(new Hero(new Random().nextInt()*1000, Level.SIXTEEN, Bild.ATTACK));
         set.add(new Hero(new Random().nextInt()*1000, Level.TEN, Bild.ATTACK));
-        set.add(new Hero(new Random().nextInt()*1000, Level.TEN, Bild.ATTACK));
-        set.add(new Hero(new Random().nextInt()*1000, Level.TWELVE, Bild.ATTACK));
         set.add(new Hero(new Random().nextInt()*1000, Level.TEN, Bild.ATTACK));
 
-        set.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
-        set.add(new Hero(new Random().nextInt()*1000, Level.SIXTEEN, Bild.ATTACK));
-        set.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
-        set.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
+        set.add(new Hero(new Random().nextInt()*1000, Level.ELEVEN, Bild.ATTACK));
+        set.add(new Hero(new Random().nextInt()*1000, Level.TWELVE, Bild.ATTACK));
         set.add(new Hero(new Random().nextInt()*1000, Level.FIFTEEN, Bild.ATTACK));
+
         set.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
+        set.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
+
+        set.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
+        set.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
+
 
         return ImmutableSet.copyOf(set);
     }

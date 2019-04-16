@@ -6,6 +6,7 @@ import com.dudoser.dto.RandomizedResult;
 import com.dudoser.dto.Team;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,16 +15,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 class Distributor {
 
-    private static final int AVERAGE_TEAM_MEMBER = 3;
-    private static final double DELTA = 20;
+    public static final int INITIAL_TEAM_MEMBER = 3;
+    private static final double DELTA = 2;
 
     private Set<Hero> distributedHeroes = new HashSet<>();
     private List<RandomizedGroup> resultDistribution = new ArrayList<>();
+    private final ImmutableSet<Hero> heroes;
 
-    RandomizedResult randomize(ImmutableSet<Hero> heroes){
-        List<Team> teamList = getTeamsList(heroes);
+    RandomizedResult randomize(){
+        return processRandom(INITIAL_TEAM_MEMBER, new ArrayList<>());
+    }
+
+    private RandomizedResult processRandom(int teamMembersCount, List<Team> unDistributedTeamList) {
+        List<Team> teamList = getTeamsList(teamMembersCount);
+        teamList.addAll(unDistributedTeamList);
 
         for (Team team : teamList) {
             if(!alreadyDistributed(distributedHeroes, team)) {
@@ -32,20 +40,28 @@ class Distributor {
             }
         }
 
+        teamList.removeIf(current -> Collections.disjoint(current.getHeroes(), distributedHeroes));
+
+        if(teamMembersCount > 1) processRandom(teamMembersCount - 1, teamList);
+
         return new RandomizedResult(resultDistribution, findNotMatchedHeroes(heroes));
     }
 
+    private boolean needForRecursion(int teamMembersCount, List<Team> teamList) {
+        return teamMembersCount != 1 && teamList.size() > 1;
+    }
+
     private Set<Hero> findNotMatchedHeroes(ImmutableSet<Hero> heroes) {
-        Set<Hero> collect = (Set<Hero>) resultDistribution.stream().flatMap(e -> {
-            HashSet set = new HashSet(e.getFirstTeam().getHeroes());
+        Set<Hero> matched = resultDistribution.stream().flatMap(e -> {
+            HashSet<Hero> set = new HashSet<>(e.getFirstTeam().getHeroes());
             set.addAll(e.getSecondTeam().getHeroes());
             return set.stream();
         }).collect(Collectors.toSet());
 
-        HashSet<Hero> unmatched = new HashSet<>(heroes);
-        unmatched.removeAll(collect);
+        HashSet<Hero> unMatched = new HashSet<>(heroes);
+        unMatched.removeAll(matched);
 
-        return unmatched;
+        return unMatched;
     }
 
     private void processResult(List<RandomizedGroup> result, Team team, Team appropriateTeam) {
@@ -77,17 +93,13 @@ class Distributor {
         return !Collections.disjoint(distributedHeroes, team.getHeroes());
     }
 
-    private List<Team> getTeamsList(ImmutableSet<Hero> heroes) {
-        Set<Set<Hero>> combinations = Sets.combinations(heroes, AVERAGE_TEAM_MEMBER);
+    private List<Team> getTeamsList(int teamMembersCount) {
+        Set<Set<Hero>> combinations = Sets.combinations(heroes, teamMembersCount);
         List<Team> weightTeamPair = combinations.stream().
                 map(e -> new Team(e, e.stream().mapToDouble(Hero::getWeight).sum()))
                 .sorted((a,b) -> (-1) * Double.compare(a.getWeight(), b.getWeight()))
                 .collect(Collectors.toList());
         return weightTeamPair;
-    }
-
-    private double calculateAverageGroupWeight(ImmutableSet<Hero> heroes) {
-        return heroes.stream().mapToDouble(Hero::getWeight).sum() / AVERAGE_TEAM_MEMBER;
     }
 
 
