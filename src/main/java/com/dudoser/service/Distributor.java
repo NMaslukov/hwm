@@ -52,8 +52,9 @@ class Distributor {
 
     private Set<Hero> findAppropriateOpponent(List<Pair<Double, Set<Hero>>> allHeroes, Set<Hero> distributedHeroes, Pair<Double, Set<Hero>> targetHeroes) {
         for (Pair<Double, Set<Hero>> group: allHeroes) {
-            if(!group.equals(targetHeroes) && Collections.disjoint(group.getValue(), targetHeroes.getValue()) && !alreadyDistributed(distributedHeroes, group) && Math.abs(group.getKey() - targetHeroes.getKey()) < DELTA){
+            if(!group.equals(targetHeroes) && Collections.disjoint(group.getValue(), targetHeroes.getValue())  && Math.abs(group.getKey() - targetHeroes.getKey()) < DELTA){
                 distributedHeroes.addAll(group.getValue()); //добавляем в Distributed тут
+                distributedHeroes.addAll(targetHeroes.getValue());
                 return group.getValue();
             }
         }
