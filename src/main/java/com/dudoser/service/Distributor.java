@@ -40,7 +40,7 @@ class Distributor {
             }
         }
 
-        teamList.removeIf(current -> Collections.disjoint(current.getHeroes(), distributedHeroes));
+        teamList.removeIf(current -> !Collections.disjoint(current.getHeroes(), distributedHeroes));
 
         if(teamMembersCount > 1) processRandom(teamMembersCount - 1, teamList);
 
@@ -50,10 +50,6 @@ class Distributor {
     private void addUnDistributedCombinationsAndSort(List<Team> unDistributedTeamList, List<Team> teamList) {
         teamList.addAll(unDistributedTeamList);
         teamList.sort(((a, b) -> (-1) * Double.compare(a.getWeight(), b.getWeight())));
-    }
-
-    private boolean needForRecursion(int teamMembersCount, List<Team> teamList) {
-        return teamMembersCount != 1 && teamList.size() > 1;
     }
 
     private Set<Hero> findNotMatchedHeroes(ImmutableSet<Hero> heroes) {
@@ -83,11 +79,19 @@ class Distributor {
 
     private Team findAppropriateOpponent(List<Team> allHeroes, Team targetTeam) {
         for (Team iteratedTeam: allHeroes) {
-            if(Collections.disjoint(iteratedTeam.getHeroes(), distributedHeroes) && !iteratedTeam.equals(targetTeam) && Collections.disjoint(iteratedTeam.getHeroes(), targetTeam.getHeroes())  && isBalancedOpponents(iteratedTeam, targetTeam)){
+            if(Collections.disjoint(iteratedTeam.getHeroes(), distributedHeroes)
+                    && !iteratedTeam.equals(targetTeam)
+                    && Collections.disjoint(iteratedTeam.getHeroes(), targetTeam.getHeroes())
+                    && isBalancedOpponents(iteratedTeam, targetTeam)
+                    && isNotDuel(targetTeam, iteratedTeam)){
                 return iteratedTeam;
             }
         }
         return null;
+    }
+
+    private boolean isNotDuel(Team targetTeam, Team iteratedTeam) {
+        return iteratedTeam.getHeroes().size() != 1 || targetTeam.getHeroes().size() != 1;
     }
 
     static boolean isBalancedOpponents(Team firstTeam, Team secondTeam) {
@@ -100,10 +104,9 @@ class Distributor {
 
     private List<Team> getTeamsList(int teamMembersCount) {
         Set<Set<Hero>> combinations = Sets.combinations(heroes, teamMembersCount);
-        List<Team> weightTeamPair = combinations.stream().
+        return combinations.stream().
                 map(e -> new Team(e, e.stream().mapToDouble(Hero::getWeight).sum()))
                 .collect(Collectors.toList());
-        return weightTeamPair;
     }
 
 
