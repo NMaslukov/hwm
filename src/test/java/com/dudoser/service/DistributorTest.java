@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import static com.dudoser.service.Distributor.INITIAL_TEAM_MEMBER;
 import static org.junit.Assert.*;
 
 public class DistributorTest {

@@ -31,7 +31,7 @@ class Distributor {
 
     private RandomizedResult processRandom(int teamMembersCount, List<Team> unDistributedTeamList) {
         List<Team> teamList = getTeamsList(teamMembersCount);
-        teamList.addAll(unDistributedTeamList);
+        addUnDistributedCombinationsAndSort(unDistributedTeamList, teamList);
 
         for (Team team : teamList) {
             if(!alreadyDistributed(distributedHeroes, team)) {
@@ -45,6 +45,11 @@ class Distributor {
         if(teamMembersCount > 1) processRandom(teamMembersCount - 1, teamList);
 
         return new RandomizedResult(resultDistribution, findNotMatchedHeroes(heroes));
+    }
+
+    private void addUnDistributedCombinationsAndSort(List<Team> unDistributedTeamList, List<Team> teamList) {
+        teamList.addAll(unDistributedTeamList);
+        teamList.sort(((a, b) -> (-1) * Double.compare(a.getWeight(), b.getWeight())));
     }
 
     private boolean needForRecursion(int teamMembersCount, List<Team> teamList) {
@@ -97,7 +102,6 @@ class Distributor {
         Set<Set<Hero>> combinations = Sets.combinations(heroes, teamMembersCount);
         List<Team> weightTeamPair = combinations.stream().
                 map(e -> new Team(e, e.stream().mapToDouble(Hero::getWeight).sum()))
-                .sorted((a,b) -> (-1) * Double.compare(a.getWeight(), b.getWeight()))
                 .collect(Collectors.toList());
         return weightTeamPair;
     }
