@@ -30,8 +30,7 @@ class Distributor {
     }
 
     private RandomizedResult processRandom(int teamMembersCount, List<Team> unDistributedTeamList) {
-        List<Team> teamList = getTeamsList(teamMembersCount);
-        addUnDistributedCombinationsAndSort(unDistributedTeamList, teamList);
+        List<Team> teamList = getAllCombinationsSortedList(teamMembersCount, unDistributedTeamList);
 
         for (Team team : teamList) {
             if(!alreadyDistributed(distributedHeroes, team)) {
@@ -47,9 +46,11 @@ class Distributor {
         return new RandomizedResult(resultDistribution, findNotMatchedHeroes(heroes));
     }
 
-    private void addUnDistributedCombinationsAndSort(List<Team> unDistributedTeamList, List<Team> teamList) {
+    private List<Team> getAllCombinationsSortedList(int teamMembersCount, List<Team> unDistributedTeamList) {
+        List<Team> teamList = getTeamsList(teamMembersCount);
         teamList.addAll(unDistributedTeamList);
         teamList.sort(((a, b) -> (-1) * Double.compare(a.getWeight(), b.getWeight())));
+        return teamList;
     }
 
     private Set<Hero> findNotMatchedHeroes(ImmutableSet<Hero> heroes) {
@@ -107,18 +108,5 @@ class Distributor {
         return combinations.stream().
                 map(e -> new Team(e, e.stream().mapToDouble(Hero::getWeight).sum()))
                 .collect(Collectors.toList());
-    }
-
-
-
-
-
-
-
-
-
-
-    private void log(String s) {
-        System.out.println(s);
     }
 }
