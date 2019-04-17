@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 class Distributor {
 
     public static final int INITIAL_TEAM_MEMBER = 3;
-    private static final double DELTA = 2;
+    public static final double DELTA = 2;
 
     private Set<Hero> distributedHeroes = new HashSet<>();
     private List<RandomizedGroup> resultDistribution = new ArrayList<>();
