@@ -1,11 +1,9 @@
 package com.dudoser.service;
 
 import com.dudoser.dto.Hero;
-import com.dudoser.dto.Team;
 import com.dudoser.enums.Bild;
 import com.dudoser.enums.Level;
 import com.google.common.collect.ImmutableSet;
-import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -14,58 +12,59 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import static org.junit.Assert.assertTrue;
+public class DistributorFirstTest extends DistributorBaseTest{
 
-public class DistributorFirstTest extends DistributorBaseTest {
-
-    private static Set<Hero> heroes = prepareResultHeroSet();
+    private static final Level L9 = prepareLevelMock(5.0, Level.NINTH.name());
+    private static final Level L10 = prepareLevelMock(12.5, Level.TEN.name());
+    private static final Level L13 = prepareLevelMock(20.0, Level.THIRTEEN.name());
+    private static final List<Integer[]> expectedTeamCountSequence = initExpectedTeamCountSequenceList();
+    private static ImmutableSet<Hero> testHeroes = prepareResultHeroSet();
 
     public DistributorFirstTest() {
-        super(ImmutableSet.copyOf(heroes), 0, heroes.size() / (Distributor.INITIAL_TEAM_MEMBER * 2));
-
+        super(testHeroes, 0, 2, expectedTeamCountSequence);
     }
 
-    private static Set<Hero> prepareResultHeroSet() {
-        Level l9 = prepareLevelMock(1.0, Level.NINTH.name());
-        Level l10 = prepareLevelMock(10.0, Level.TEN.name());
-
+    private static ImmutableSet<Hero> prepareResultHeroSet() {
         Set<Hero> resultSet = new HashSet<>();
-        resultSet.addAll(prepareHeroSet(l9, l10));
-        resultSet.addAll(prepareHeroSet(l9, l10));
-        return resultSet;
+        resultSet.addAll(prepareFirstHeroSet());
+        resultSet.addAll(prepareSecondHeroSet());
+        return ImmutableSet.copyOf(resultSet);
     }
 
-    private static Set<Hero> prepareHeroSet(Level l9, Level l10) {
+    private static Set<Hero> prepareFirstHeroSet() {
         Set<Hero> heroesSet = new HashSet<>();
-        heroesSet.add(new Hero(new Random().nextInt()*1000, l9, Bild.ATTACK));
-        heroesSet.add(new Hero(new Random().nextInt()*1000, l10, Bild.ATTACK));
-        heroesSet.add(new Hero(new Random().nextInt()*1000, l10, Bild.ATTACK));
+        heroesSet.add(new Hero(new Random().nextInt()*1000, L9, Bild.ATTACK));
+        heroesSet.add(new Hero(new Random().nextInt()*1000, L10, Bild.ATTACK));
+        heroesSet.add(new Hero(new Random().nextInt()*1000, L10, Bild.ATTACK));
+
+        heroesSet.add(new Hero(new Random().nextInt()*1000, L9, Bild.ATTACK));
+        heroesSet.add(new Hero(new Random().nextInt()*1000, L10, Bild.ATTACK));
+        heroesSet.add(new Hero(new Random().nextInt()*1000, L10, Bild.ATTACK));
+        return heroesSet;
+    }
+
+    private static Set<Hero> prepareSecondHeroSet() {
+        Set<Hero> heroesSet = new HashSet<>();
+        heroesSet.add(new Hero(new Random().nextInt()*1000, L9, Bild.ATTACK));
+        heroesSet.add(new Hero(new Random().nextInt()*1000, L13, Bild.ATTACK));
+
+        heroesSet.add(new Hero(new Random().nextInt()*1000, L10, Bild.ATTACK));
+        heroesSet.add(new Hero(new Random().nextInt()*1000, L10, Bild.ATTACK));
         return heroesSet;
     }
 
     private static Level prepareLevelMock(double mockWeight, String mockName) {
-        Level l9 = Mockito.mock(Level.class);
-        Mockito.when(l9.getLevelWeight()).thenReturn(mockWeight);
-        Mockito.when(l9.name()).thenReturn(mockName);
-        return l9;
+        Level mockLevel = Mockito.mock(Level.class);
+        Mockito.when(mockLevel.getLevelWeight()).thenReturn(mockWeight);
+        Mockito.when(mockLevel.name()).thenReturn(mockName);
+        return mockLevel;
     }
 
-    @Test
-    public void isBalancedOpponents() {
-        double weight = Distributor.DELTA;
-        assertTrue(Distributor.isBalancedOpponents(new Team(prepareHeroSet(Level.NINTH, Level.NINTH), weight),
-                new Team(prepareHeroSet(Level.NINTH, Level.NINTH), weight)));
+    private static List<Integer[]> initExpectedTeamCountSequenceList() {
+        List<Integer[]> list = new ArrayList<>();
+        list.add(new Integer[]{3, 3});
+        list.add(new Integer[]{2, 2});
+        return list;
     }
 
-    @Test
-    public void randomizeTeamHeroesCountTest(){
-        randomizedResult.getRandomizedGroups().forEach(e -> {
-
-            List<Hero> firstGroup = new ArrayList<>(e.getFirstTeam().getHeroes());
-            List<Hero> secondGroup = new ArrayList<>(e.getSecondTeam().getHeroes());
-
-            int teamSize = heroes.size() / 2;
-            assertTrue(firstGroup.size() == teamSize && secondGroup.size() == teamSize);
-        });
-    }
 }

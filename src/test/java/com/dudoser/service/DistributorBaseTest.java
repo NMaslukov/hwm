@@ -6,11 +6,11 @@ import com.dudoser.dto.RandomizedResult;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DistributorBaseTest {
 
@@ -18,11 +18,13 @@ public class DistributorBaseTest {
     private final ImmutableSet<Hero> testList;
     private final int undistributedHeroesAmount;
     private final int expectedGroupAmount;
+    private final List<Integer[]> expectedTeamCountSequence;
 
-    DistributorBaseTest(ImmutableSet<Hero> testList, int undistributedHeroesAmount, int expectedGroupAmount){
-        this.testList = testList;
+    DistributorBaseTest(ImmutableSet<Hero> testHeroes, int undistributedHeroesAmount, int expectedGroupAmount, List<Integer[]> expectedTeamCountSequence){
+        this.testList = testHeroes;
         this.undistributedHeroesAmount = undistributedHeroesAmount;
         this.expectedGroupAmount = expectedGroupAmount;
+        this.expectedTeamCountSequence = expectedTeamCountSequence;
         randomizedResult = getRandomizedResult();
     }
 
@@ -51,6 +53,17 @@ public class DistributorBaseTest {
                     assertTrue(Distributor.isBalancedOpponents(e.getFirstTeam(), e.getSecondTeam()));
                 }
         );
+    }
+
+    @Test
+    public void randomizeTeamHeroesCountTest(){
+        List<RandomizedGroup> randomizedGroups = randomizedResult.getRandomizedGroups();
+        for (int i = 0; i < randomizedGroups.size(); i++) {
+            List<Hero> firstGroup = new ArrayList<>(randomizedGroups.get(i).getFirstTeam().getHeroes());
+            List<Hero> secondGroup = new ArrayList<>(randomizedGroups.get(i).getSecondTeam().getHeroes());
+
+            assertArrayEquals(new Integer[]{firstGroup.size(), secondGroup.size()}, expectedTeamCountSequence.get(i));
+        }
     }
 
     private RandomizedResult getRandomizedResult() {

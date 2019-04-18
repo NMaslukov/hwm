@@ -5,20 +5,19 @@ import com.dudoser.enums.Bild;
 import com.dudoser.enums.Level;
 import com.google.common.collect.ImmutableSet;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 public class DistributorSecondTest extends DistributorBaseTest {
 
+    private static final List<Integer[]> expectedTeamCountSequence = initExpectedTeamCountSequenceList();
     private static ImmutableSet<Hero> testList = initResultSet();
 
-    static {
-
-    }
-
     public DistributorSecondTest() {
-        super(testList, 0, 2);
+        super(testList, 0, 2, expectedTeamCountSequence);
     }
 
     private static ImmutableSet<Hero> initResultSet() {
@@ -61,5 +60,13 @@ public class DistributorSecondTest extends DistributorBaseTest {
         fourthHeroesSet.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
         fourthHeroesSet.add(new Hero(new Random().nextInt()*1000, Level.NINTH, Bild.ATTACK));
         return fourthHeroesSet;
+    }
+
+    private static List<Integer[]> initExpectedTeamCountSequenceList() {
+        List<Integer[]> expectedTeamCountSequence = new ArrayList<>();
+        expectedTeamCountSequence.add(new Integer[]{3, 3});
+        expectedTeamCountSequence.add(new Integer[]{3, 3});
+
+        return expectedTeamCountSequence;
     }
 }
