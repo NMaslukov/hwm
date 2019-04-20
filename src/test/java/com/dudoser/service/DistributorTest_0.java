@@ -16,14 +16,14 @@ import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
-public class DistributorZeroTest extends DistributorBaseTest {
+public class DistributorTest_0 extends DistributorBaseTest {
 
     private static final Level l9 = prepareLevelMock(1.0, Level.NINTH.name());
     private static final Level l10 = prepareLevelMock(10.0, Level.TEN.name());
     private static final List<Integer[]> expectedTeamCountSequence = initExpectedTeamCountSequenceList();
     private static Set<Hero> heroes = prepareResultHeroSet();
 
-    public DistributorZeroTest() {
+    public DistributorTest_0() {
         super(ImmutableSet.copyOf(heroes), 0, 1, expectedTeamCountSequence);
 
     }

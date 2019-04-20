@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-public class DistributorSecondTest extends DistributorBaseTest {
+public class DistributorTest_2 extends DistributorBaseTest {
 
     private static final List<Integer[]> expectedTeamCountSequence = initExpectedTeamCountSequenceList();
     private static ImmutableSet<Hero> testList = initResultSet();
 
-    public DistributorSecondTest() {
+    public DistributorTest_2() {
         super(testList, 0, 2, expectedTeamCountSequence);
     }
 

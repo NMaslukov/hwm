@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-public class DistributorFirstTest extends DistributorBaseTest{
+public class DistributorTest_1 extends DistributorBaseTest{
 
     private static final Level L9 = prepareLevelMock(5.0, Level.NINTH.name());
     private static final Level L10 = prepareLevelMock(12.5, Level.TEN.name());
-    private static final Level L13 = prepareLevelMock(20.0, Level.THIRTEEN.name());
+    private static final Level L13 = prepareLevelMock(19.0, Level.THIRTEEN.name());
     private static final List<Integer[]> expectedTeamCountSequence = initExpectedTeamCountSequenceList();
     private static ImmutableSet<Hero> testHeroes = prepareResultHeroSet();
 
-    public DistributorFirstTest() {
+    public DistributorTest_1() {
         super(testHeroes, 0, 2, expectedTeamCountSequence);
     }
 
@@ -57,6 +57,7 @@ public class DistributorFirstTest extends DistributorBaseTest{
         Level mockLevel = Mockito.mock(Level.class);
         Mockito.when(mockLevel.getLevelWeight()).thenReturn(mockWeight);
         Mockito.when(mockLevel.name()).thenReturn(mockName);
+        Mockito.when(mockLevel.toString()).thenReturn(mockName);
         return mockLevel;
     }
 

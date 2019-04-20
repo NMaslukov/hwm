@@ -20,17 +20,34 @@ class Distributor {
 
     public static final int INITIAL_TEAM_MEMBER = 3;
     public static final double DELTA = 2;
+    private static final int reversedDirectionSort = 1;
+    private static final int linearDirectionSort = -1;
 
     private Set<Hero> distributedHeroes = new HashSet<>();
     private List<RandomizedGroup> resultDistribution = new ArrayList<>();
     private final ImmutableSet<Hero> heroes;
 
     RandomizedResult randomize(){
-        return processRandom(INITIAL_TEAM_MEMBER, new ArrayList<>());
+        RandomizedResult randomizedLinearResult = processRandom(INITIAL_TEAM_MEMBER,  new ArrayList<>(), linearDirectionSort);
+
+        resetContext();
+
+        RandomizedResult randomizedReversedResult = processRandom(INITIAL_TEAM_MEMBER,  new ArrayList<>(), reversedDirectionSort);
+
+        return getBetterResult(randomizedLinearResult, randomizedReversedResult);
     }
 
-    private RandomizedResult processRandom(int teamMembersCount, List<Team> unDistributedTeamList) {
-        List<Team> teamList = getAllCombinationsSortedList(teamMembersCount, unDistributedTeamList);
+    private RandomizedResult getBetterResult(RandomizedResult firstResult, RandomizedResult secondResult) {
+        return firstResult.getNotMatchedHeroes().size() < secondResult.getRandomizedGroups().size() ? firstResult : secondResult;
+    }
+
+    private void resetContext() {
+        distributedHeroes = new HashSet<>();
+        resultDistribution = new ArrayList<>();
+    }
+
+    private RandomizedResult processRandom(int teamMembersCount, List<Team> unDistributedTeamList, int sortDirection) {
+        List<Team> teamList = getAllCombinationsSortedTeams(teamMembersCount, unDistributedTeamList, sortDirection);
 
         for (Team team : teamList) {
             if(!alreadyDistributed(distributedHeroes, team)) {
@@ -41,15 +58,15 @@ class Distributor {
 
         teamList.removeIf(current -> !Collections.disjoint(current.getHeroes(), distributedHeroes));
 
-        if(teamMembersCount > 1) processRandom(teamMembersCount - 1, teamList);
+        if(teamMembersCount > 1) processRandom(teamMembersCount - 1, teamList, sortDirection);
 
         return new RandomizedResult(resultDistribution, findNotMatchedHeroes(heroes));
     }
 
-    private List<Team> getAllCombinationsSortedList(int teamMembersCount, List<Team> unDistributedTeamList) {
+    private List<Team> getAllCombinationsSortedTeams(int teamMembersCount, List<Team> unDistributedTeamList, int sortDirection) {
         List<Team> teamList = getTeamsList(teamMembersCount);
         teamList.addAll(unDistributedTeamList);
-        teamList.sort(((a, b) -> (-1) * Double.compare(a.getWeight(), b.getWeight())));
+        teamList.sort(((a, b) -> sortDirection * Double.compare(a.getWeight(), b.getWeight())));
         return teamList;
     }
 
