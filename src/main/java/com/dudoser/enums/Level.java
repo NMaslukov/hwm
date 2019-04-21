@@ -6,9 +6,9 @@ public enum  Level {
     ELEVEN(250),
     TWELVE(400),
     THIRTEEN(600),
-    FOURTEEN(1000),
+    FOURTEEN(950),
     FIFTEEN(1250),
-    SIXTEEN(1800);
+    SIXTEEN(1750);
 
     private double levelWeight;
 
