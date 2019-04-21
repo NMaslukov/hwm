@@ -1,19 +1,27 @@
 package com.dudoser;
 
+import com.sun.deploy.util.StringUtils;
+import sun.swing.StringUIClientPropertyKey;
+
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.Serializable;
 
 public class LogGenerator  {
-
-    public static void main(String[] args) throws Exception {
+    private static String imports = "\nimport org.apache.logging.log4j.LogManager;\n" +
+            "import org.apache.logging.log4j.Logger;\n";
+    public static void main(String[] args) throws Throwable {
         File basedir = new File("/home/dudoser/IdeaProjects/exrates-inout-service/src/main/java/com/exrates/inout/");
         process(basedir);
     }
 
-    private static void process(File basedir) throws Exception {
+    private static void process(File basedir) throws Throwable {
         for (File file : basedir.listFiles()) {
-
+            if(file.getName().equalsIgnoreCase("EDCServiceNodeImpl.java")){
+                System.out.println("21");
+            }
             if(file.isFile()){
                 processFile(file);
             } else {
@@ -24,17 +32,33 @@ public class LogGenerator  {
         }
     }
 
-    private static void processFile(File file) throws Exception {
+    private static void processFile(File file) throws Throwable {
         String classText = readFile(file);
-        if(classText.contains("enum")) return;
+        if(classText.contains("public enum")) return;
 
         if (classText.contains("@Log4j")){
-            String newClassText = classText.substring(0, classText.indexOf("{"));
-            newClassText += "\n" + "private static final Logger logger = LogManager.getLogger(tpcname);";
+
+            String newClassText = getSubstring(classText);
+            newClassText += "\n\n" +    "   private static final Logger log = LogManager.getLogger(tpcname);\n";
             String topicName = getTopicName(classText);
-            System.out.println(topicName);
-            newClassText.replace("tpcname", topicName);
+            if(topicName == null || topicName.length() == 0 ) throw new RuntimeException("Topic name = " + topicName);
+            newClassText = newClassText.replace("tpcname", topicName);
+            newClassText += classText.substring(classText.indexOf("{", classText.indexOf("public class")) + 1);
+
+            newClassText = newClassText.replaceFirst(";", ";" + imports);
+            write(newClassText, file);
         }
+    }
+
+    private static String getSubstring(String classText) {
+        return classText.substring(0, classText.indexOf("{", classText.indexOf("public class")) + 1);
+    }
+
+    private static void write(String newClassText, File file) throws Throwable{
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, false));
+        bufferedWriter.write(newClassText);
+        bufferedWriter.flush();
+        bufferedWriter.close();
     }
 
     private static String getTopicName(String classText) {
@@ -48,23 +72,15 @@ public class LogGenerator  {
 
     private static String extractTopicNameAsClassName(String classText) {
         try {
-            String aClass = "class";
-            String from = classText.substring(classText.indexOf(aClass) + aClass.length());
+            String aClass = "public class";
+            String from = classText.substring(classText.indexOf(aClass) + aClass.length() + 1);
 
-            if(classText.contains("SSMConfiguration")){
-                System.out.println(2);
-            }
-            int endIndex = from.indexOf("{");
-            if (!classText.contains("class SSMConfiguration") && classText.contains("extends")){
-                endIndex = classText.indexOf("extends");
-            } else
-            if(!classText.contains("class SSMConfiguration") && classText.contains("implements")){
-                endIndex = classText.indexOf("implements");
-            }
+            int endIndex = from.indexOf(" ");
+
 
             return from.substring(0 , endIndex).trim() + ".class";
         } catch (Exception e){
-            System.out.println(e);
+            e.printStackTrace();
             return null;
         }
     }
