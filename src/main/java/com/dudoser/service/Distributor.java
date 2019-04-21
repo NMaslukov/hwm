@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 class Distributor {
 
     public static final int INITIAL_TEAM_MEMBER = 3;
-    public static final double DELTA = 2;
+    public static final double DELTA = 60;
     private static final int reversedDirectionSort = 1;
     private static final int linearDirectionSort = -1;
 

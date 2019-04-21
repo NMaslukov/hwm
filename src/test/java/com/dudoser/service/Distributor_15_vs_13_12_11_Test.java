@@ -31,6 +31,7 @@ public class Distributor_15_vs_13_12_11_Test extends DistributorBaseTest {
         heroesSet.add(new Hero(new Random().nextInt()*1000, Level.ELEVEN, Bild.ATTACK));
         heroesSet.add(new Hero(new Random().nextInt()*1000, Level.TWELVE, Bild.ATTACK));
         heroesSet.add(new Hero(new Random().nextInt()*1000, Level.THIRTEEN, Bild.ATTACK));
+
         heroesSet.add(new Hero(new Random().nextInt()*1000, Level.FIFTEEN, Bild.ATTACK));
         return heroesSet;
     }
