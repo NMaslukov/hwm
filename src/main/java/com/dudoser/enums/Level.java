@@ -3,12 +3,12 @@ package com.dudoser.enums;
 public enum  Level {
     NINTH(100),
     TEN(150),
-    ELEVEN(10.22),
+    ELEVEN(250),
     TWELVE(400),
-    THIRTEEN(13.92),
-    FOURTEEN(16.38),
-    FIFTEEN(50),
-    SIXTEEN(100);
+    THIRTEEN(600),
+    FOURTEEN(1000),
+    FIFTEEN(1250),
+    SIXTEEN(1800);
 
     private double levelWeight;
 
