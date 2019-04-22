@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 class Distributor {
 
-    public static final int INITIAL_TEAM_MEMBER = 3;
-    public static final double DELTA = 60;
+    static final double DELTA = 0.07;
+    private static final int INITIAL_TEAM_MEMBER = 3;
     private static final int reversedDirectionSort = 1;
     private static final int linearDirectionSort = -1;
 
-    private Set<Hero> distributedHeroes = new HashSet<>();
-    private List<RandomizedGroup> resultDistribution = new ArrayList<>();
     private final ImmutableSet<Hero> heroes;
+    private Set<Hero> distributedHeroes = new HashSet<>();
+    private List<RandomizedGroup> distributionResult = new ArrayList<>();
 
     RandomizedResult randomize(){
         RandomizedResult randomizedLinearResult = processRandom(INITIAL_TEAM_MEMBER,  new ArrayList<>(), linearDirectionSort);
@@ -43,7 +43,7 @@ class Distributor {
 
     private void resetContext() {
         distributedHeroes = new HashSet<>();
-        resultDistribution = new ArrayList<>();
+        distributionResult = new ArrayList<>();
     }
 
     private RandomizedResult processRandom(int teamMembersCount, List<Team> unDistributedTeamList, int sortDirection) {
@@ -52,7 +52,7 @@ class Distributor {
         for (Team team : teamList) {
             if(!alreadyDistributed(distributedHeroes, team)) {
                 Team appropriateOpponent = findAppropriateOpponent(teamList, team);
-                processResult(resultDistribution, team, appropriateOpponent);
+                processResult(distributionResult, team, appropriateOpponent);
             }
         }
 
@@ -60,7 +60,7 @@ class Distributor {
 
         if(teamMembersCount > 1) processRandom(teamMembersCount - 1, teamList, sortDirection);
 
-        return new RandomizedResult(resultDistribution, findNotMatchedHeroes(heroes));
+        return new RandomizedResult(distributionResult, findNotMatchedHeroes(heroes));
     }
 
     private List<Team> getAllCombinationsSortedTeams(int teamMembersCount, List<Team> unDistributedTeamList, int sortDirection) {
@@ -71,7 +71,7 @@ class Distributor {
     }
 
     private Set<Hero> findNotMatchedHeroes(ImmutableSet<Hero> heroes) {
-        Set<Hero> matched = resultDistribution.stream().flatMap(e -> {
+        Set<Hero> matched = distributionResult.stream().flatMap(e -> {
             HashSet<Hero> set = new HashSet<>(e.getFirstTeam().getHeroes());
             set.addAll(e.getSecondTeam().getHeroes());
             return set.stream();
@@ -113,7 +113,7 @@ class Distributor {
     }
 
     static boolean isBalancedOpponents(Team firstTeam, Team secondTeam) {
-        return Math.abs(firstTeam.getWeight() - secondTeam.getWeight()) < DELTA;
+        return Math.abs(firstTeam.getWeight() - secondTeam.getWeight()) < DELTA * Math.min(firstTeam.getWeight(), secondTeam.getWeight());
     }
 
     private boolean alreadyDistributed(Set<Hero> distributedHeroes, Team team) {

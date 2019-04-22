@@ -4,7 +4,7 @@ public enum  Level {
     NINTH(100),
     TEN(155),
     ELEVEN(250),
-    TWELVE(450),
+    TWELVE(410),
     THIRTEEN(600),
     FOURTEEN(1000),
     FIFTEEN(1300),
