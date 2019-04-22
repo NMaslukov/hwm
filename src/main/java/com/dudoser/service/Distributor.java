@@ -58,11 +58,15 @@ class Distributor {
             }
         }
 
-        teamList.removeIf(current -> !Collections.disjoint(current.getHeroes(), distributedHeroes));
+        removeTeamsWithAlreadyDistributedHeroes(teamList);
 
         if(teamMembersCount > 1) processRandom(teamMembersCount - 1, teamList, sortDirection);
 
         return new RandomizedResult(distributionResult, findNotMatchedHeroes(heroes));
+    }
+
+    private void removeTeamsWithAlreadyDistributedHeroes(List<Team> teamList) {
+        teamList.removeIf(current -> !Collections.disjoint(current.getHeroes(), distributedHeroes));
     }
 
     private List<Team> getAllCombinationsSortedTeams(int teamMembersCount, List<Team> unDistributedTeamList, int sortDirection) {
