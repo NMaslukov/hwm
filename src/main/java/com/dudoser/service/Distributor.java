@@ -84,14 +84,14 @@ class Distributor {
     }
 
     private void processResult(List<RandomizedGroup> result, Team team, Team appropriateTeam) {
-        if(opponentFound(appropriateTeam)) {
+        if(isOpponentFound(appropriateTeam)) {
             result.add(new RandomizedGroup(team, appropriateTeam));
             distributedHeroes.addAll(team.getHeroes());
             distributedHeroes.addAll(appropriateTeam.getHeroes());
         }
     }
 
-    private boolean opponentFound(Team set){
+    private boolean isOpponentFound(Team set){
         return set != null;
     }
 
@@ -99,13 +99,17 @@ class Distributor {
         for (Team iteratedTeam: allHeroes) {
             if(Collections.disjoint(iteratedTeam.getHeroes(), distributedHeroes)
                     && !iteratedTeam.equals(targetTeam)
-                    && Collections.disjoint(iteratedTeam.getHeroes(), targetTeam.getHeroes())
+                    && isTeamsNotContainsIdenticalHero(targetTeam, iteratedTeam)
                     && isBalancedOpponents(iteratedTeam, targetTeam)
                     && isNotDuel(targetTeam, iteratedTeam)){
                 return iteratedTeam;
             }
         }
         return null;
+    }
+
+    private boolean isTeamsNotContainsIdenticalHero(Team targetTeam, Team iteratedTeam) {
+        return Collections.disjoint(iteratedTeam.getHeroes(), targetTeam.getHeroes());
     }
 
     private boolean isNotDuel(Team targetTeam, Team iteratedTeam) {
