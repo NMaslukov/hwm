@@ -24,24 +24,26 @@ class Distributor {
     private static final int linearDirectionSort = -1;
 
     private final ImmutableSet<Hero> heroes;
-    private Set<Hero> distributedHeroes = new HashSet<>();
-    private List<RandomizedGroup> distributionResult = new ArrayList<>();
+    private Set<Hero> distributedHeroes;
+    private List<RandomizedGroup> distributionResult;
 
     RandomizedResult randomize(){
-        RandomizedResult randomizedLinearResult = processRandom(INITIAL_TEAM_MEMBER,  new ArrayList<>(), linearDirectionSort);
-
-        resetContext();
-
-        RandomizedResult randomizedReversedResult = processRandom(INITIAL_TEAM_MEMBER,  new ArrayList<>(), reversedDirectionSort);
+        RandomizedResult randomizedLinearResult = processRandomByDirection(linearDirectionSort);
+        RandomizedResult randomizedReversedResult = processRandomByDirection(reversedDirectionSort);
 
         return getBetterResult(randomizedLinearResult, randomizedReversedResult);
+    }
+
+    private RandomizedResult processRandomByDirection(int linearDirectionSort) {
+        initContext();
+        return processRandom(INITIAL_TEAM_MEMBER, new ArrayList<>(), linearDirectionSort);
     }
 
     private RandomizedResult getBetterResult(RandomizedResult firstResult, RandomizedResult secondResult) {
         return firstResult.getNotMatchedHeroes().size() < secondResult.getRandomizedGroups().size() ? firstResult : secondResult;
     }
 
-    private void resetContext() {
+    private void initContext() {
         distributedHeroes = new HashSet<>();
         distributionResult = new ArrayList<>();
     }
